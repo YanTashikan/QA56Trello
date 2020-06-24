@@ -30,48 +30,25 @@ public class ProfilesVisabilityTests extends TestBase {
         boardsPage.waitUntilPageIsLoaded();
         currentBoard.openCurrentBoard(BOARD_TITLE);
         currentBoard.waitUntilPageBoardIsLoaded(BOARD_TITLE);
-
-        //---- Open Up_Right Menu ----
         profilePage.openUpRightMenu();
-
-        //---- Open ProfileVisability Menu ----
         profilePage.openProfileAndVisabilityMenu();
-
-
     }
 
     @Test
     public void lettersIconTest(){
-        //--- Receive Upper Right Menu element---
-        WebElement upRightMenu = driver.findElement(By.xpath("//button[@data-test-id = 'header-member-menu-button']"));
-        WebElement upRightMenuText = upRightMenu.findElement(By.xpath(".//span"));
-        //--- Receive list of necessary icons ---
-        List<WebElement> iconsList = driver.findElements(By.xpath(createLocatorIconlist(USERNAME)));
-        int counter = 0;
-        for(WebElement element: iconsList)
-            if (element.getText().equals(upRightMenuText.getText())) counter++;
 
-        Assert.assertEquals(2,counter, "The text on the upper right icon and on the icon on profile is not the same");
+        Assert.assertEquals(2,profilePage.getIndexIcon(USERNAME), "The text on the upper right icon and on the icon on profile is not the same");
     }
 
     @Test
     public void userNameDisplayingTest(){
-
-        //--- Receive UserName after shtrudel without username value
-        WebElement userNameAfterShtrudel = driver.findElement(By.xpath("//span[contains(text(),'@')]"));
-
-        //--- Receive UserName from user name field
-        WebElement userNameField = driver.findElement(By.xpath("//input[@name='username']"));
-        System.out.println("userNameAfterShtrudel: " + userNameAfterShtrudel.getText());
-        System.out.println("userNameField: " + userNameField.getAttribute("value"));
-
-        Assert.assertTrue(userNameAfterShtrudel.getText().contains(USERNAME)&&userNameField.getAttribute("value").equals(USERNAME));
+        System.out.println("userNameAfterShtrudel: " + profilePage.getUserNameAfterShtrudel());
+        System.out.println("userNameField: " + profilePage.getUserNameFieldText());
+        Assert.assertTrue(profilePage.getUserNameAfterShtrudel().contains(USERNAME)&&profilePage.getUserNameFieldText().equals(USERNAME));
     }
 
 
-    private String createLocatorIconlist(String username) {
-        return "//div[@title='" + username + " (" + username + ")']//span";
-    }
+
 
 
 }
