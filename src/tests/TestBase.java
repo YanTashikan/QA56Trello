@@ -10,7 +10,7 @@ import org.testng.annotations.BeforeMethod;
 
 public class TestBase {
     WebDriver driver;
-    public static final String BOARD_TITLE = "QA Haifa56";
+    public static final String BOARD_TITLE = "SecondBoard";
     public static final String LOGIN = "yantashikan@gmail.com";
     public static final String PASSWORD = "ACSd47pifP36QZV";
     public static final String USERNAME ="olegitahov";

@@ -42,49 +42,30 @@ public class LoginTests extends TestBase{
 
     @Test
     public void NegativeLoginIncorrect() throws InterruptedException {
-        //--- Press log In menu button
-        driver.findElement(By.linkText("Log In")).click();
-        waitUntilElementIsVisible(By.xpath("//input[@id='login']"),10);
-
-        //--- Enter Incorrect Login
-        WebElement loginField = driver.findElement(By.id("user"));
-        loginField.sendKeys("ttt@test.com");
-
-
-        //----Click 'Log in' button ----
-        driver.findElement(By.id("login")).click();
-        waitUntilElementIsVisible(By.xpath("(//*[@class= 'error-message'])[1]"),15);
-        WebElement errorMessage = driver.findElement(By.xpath("(//*[@class= 'error-message'])[1]"));
-        System.out.println("Error message: " + errorMessage.getText());
-        Assert.assertEquals(errorMessage.getText(), "There isn't an account for this email","Error message is not correct");
+        loginPage.openLoginPage();
+        loginPage.enterLogin("ttt@test.com");
+        loginPage.pressLoginButton();
+        loginPage.waitErrorMessage();
+        System.out.println("Error message: " + loginPage.getErrorMessage());
+        Assert.assertEquals(loginPage.getErrorMessage(), "There isn't an account for this email","Error message is not correct");
     }
 
     @Test
     public void NegativePasswordIncorrect() throws InterruptedException {
         //--- Press log In menu button
-        driver.findElement(By.linkText("Log In")).click();
-        waitUntilElementIsVisible(By.xpath("//input[@id='login']"),10);
+        loginPage.openLoginPage();
 
         //--- Enter Correct Login
-        WebElement loginField = driver.findElement(By.id("user"));
-        loginField.sendKeys(LOGIN);
-        waitUntilAttributeValueIs(By.
-                id("login"),"value","Log in with Atlassian",10);
-
-        //----Click 'Log in' button ----
-        driver.findElement(By.id("login")).click();
-        waitUntilElementIsClickable(By.id("login-submit"),15);
+        loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
 
         //---Enter incorrect password ---
-        WebElement passwordLogin = driver.findElement(By.id("password"));
-        passwordLogin.sendKeys("error");
-        driver.findElement(By.id("login-submit")).click();
-        waitUntilElementIsVisible(By.xpath("//div[@id='login-error']/span"),15);
+        loginPage.enterPasswordAtlassionAndClickLogin("error");
+
+        loginPage.waitAtlassianErrorMessage();
 
         //---Print error message ---
-        WebElement errorMessage = driver.findElement(By.xpath("//div[@id='login-error']/span"));
-        System.out.println("Error message: " + errorMessage.getText());
-        Assert.assertTrue(errorMessage.getText().contains("Incorrect email address and / or password."),
+        System.out.println("Error message: " + loginPage.getAtlassianErrorMessage());
+        Assert.assertTrue(loginPage.getAtlassianErrorMessage().contains("Incorrect email address and / or password."),
                 "There is no error message or the text of the message is not correct");
     }
 

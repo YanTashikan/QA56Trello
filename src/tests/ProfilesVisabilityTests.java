@@ -5,44 +5,37 @@ import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pages.BoardsPageHelper;
+import pages.CurrentBoardHelper;
+import pages.LoginPageHelper;
+import pages.ProfilesVisibilityHelper;
 
 import java.util.List;
 
 public class ProfilesVisabilityTests extends TestBase {
 
+    LoginPageHelper loginPage;
+    BoardsPageHelper boardsPage;
+    CurrentBoardHelper currentBoard;
+    ProfilesVisibilityHelper profilePage;
+
     @BeforeMethod
     public void initTests() throws InterruptedException {
-        //--- Press log In menu button
-        driver.findElement(By.linkText("Log In")).click();
-        waitUntilElementIsClickable(By.id("login"),10);
-
-        //----Enter login value and click 'Log in' button ----
-        driver.findElement(By.id("user")).sendKeys(LOGIN);
-        waitUntilAttributeValueIs(By.
-                id("login"),"value","Log in with Atlassian",10);
-
-        driver.findElement(By.id("login")).click();
-        waitUntilElementIsClickable(By.id("login-submit"),15);
-
-        //---- Enter password value and click 'Log in' button
-        driver.findElement(By.id("password")).sendKeys(PASSWORD);
-        driver.findElement(By.id("login-submit")).click();
-        waitUntilElementIsClickable(By
-                .xpath("//button[@data-test-id='header-boards-menu-button']/span[2]"),40);
-        System.out.println("'Boards' button text: " + driver
-                .findElement(By.xpath("//button[@data-test-id='header-boards-menu-button']/span[2]")).getText());
+        loginPage = new LoginPageHelper(driver);
+        boardsPage = new BoardsPageHelper(driver);
+        currentBoard = new CurrentBoardHelper(driver);
+        profilePage = new ProfilesVisibilityHelper(driver);
+        loginPage.openLoginPage();
+        loginPage.loginAsAtlassian(LOGIN,PASSWORD);
+        boardsPage.waitUntilPageIsLoaded();
+        currentBoard.openCurrentBoard(BOARD_TITLE);
+        currentBoard.waitUntilPageBoardIsLoaded(BOARD_TITLE);
 
         //---- Open Up_Right Menu ----
-        WebElement upRightMenu = driver.findElement(By.xpath("//button[@data-test-id = 'header-member-menu-button']"));
-        upRightMenu.click();
-        waitUntilElementIsVisible(By.xpath("//a[@data-test-id = 'header-member-menu-profile']"),10);
+        profilePage.openUpRightMenu();
 
         //---- Open ProfileVisability Menu ----
-        WebElement profileVisabilityMenu = driver
-                .findElement(By.xpath("//a[@data-test-id = 'header-member-menu-profile']"));
-        profileVisabilityMenu.click();
-        waitUntilAllElementsAreVisible(By.xpath("//button[@data-test-id = 'header-member-menu-button']"),20);
-        waitUntilElementIsClickable(By.xpath("//button[contains(text(),'Save')]"),10);
+        profilePage.openProfileAndVisabilityMenu();
 
 
     }

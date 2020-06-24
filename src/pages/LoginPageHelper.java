@@ -19,8 +19,7 @@ public class LoginPageHelper extends PageBase{
 
     public void enterLoginAtlassianAndClickLogin(String login) {
         driver.findElement(By.id("user")).sendKeys(login);
-        waitUntilAttributeValueIs(By.
-                id("login"),"value","Log in with Atlassian",10);
+        waitUntilAttributeValueIs(By.id("login"),"value","Log in with Atlassian",10);
         driver.findElement(By.id("login")).click();
 
         waitUntilElementIsClickable(By.id("login-submit"),15);
@@ -30,6 +29,16 @@ public class LoginPageHelper extends PageBase{
         driver.findElement(By.id("password")).sendKeys(password);
         driver.findElement(By.id("login-submit")).click();
     }
+
+    public void enterPassword(String password) {
+        driver.findElement(By.id("password")).sendKeys(password);
+    }
+
+    public void enterLogin(String login) {
+        driver.findElement(By.id("user")).sendKeys(login);
+    }
+
+
 
     public void loginAsAtlassian(String login, String password){
         this.enterLoginAtlassianAndClickLogin(login);
@@ -48,5 +57,15 @@ public class LoginPageHelper extends PageBase{
     public String getErrorMessage(){
         WebElement errorMessage = driver.findElement(By.cssSelector("#error>p"));
         return errorMessage.getText();
+    }
+
+    public void waitAtlassianErrorMessage() {
+        waitUntilElementIsVisible(By.xpath("//div[@id='login-error']//span"),10);
+    }
+
+    public String getAtlassianErrorMessage() {
+        WebElement errorMessage = driver.findElement(By.xpath("//div[@id='login-error']//span"));
+        return errorMessage.getText();
+
     }
 }
