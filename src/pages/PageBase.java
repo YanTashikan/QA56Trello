@@ -2,8 +2,12 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import java.util.List;
 
 public class PageBase {
     WebDriver driver;
@@ -12,10 +16,21 @@ public class PageBase {
         this.driver = driver;
     }
 
+    public PageBase() {
+    }
+
     public void waitUntilElementIsClickable(By locator, int time) {
         try {
             new WebDriverWait(driver,time).until(ExpectedConditions
                     .elementToBeClickable(locator));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void waitUntilElementIsClickable(WebElement element, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .elementToBeClickable(element));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,10 +46,28 @@ public class PageBase {
         }
     }
 
+    public void waitUntilAttributeValueIs(WebElement element, String attribute, String value, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .attributeToBe(element,attribute,value));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void waitUntilElementIsVisible(By locator, int time) {
         try {
             new WebDriverWait(driver,time).until(ExpectedConditions
                     .visibilityOfElementLocated(locator));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void waitUntilElementIsVisible(WebElement element, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .visibilityOf(element));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,4 +89,27 @@ public class PageBase {
             e.printStackTrace();
         }
     }
+
+    public void waitUntilAllElementsAreVisible(List<WebElement> elementList, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .visibilityOfAllElements(elementList));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void findBrowserTabByTitileAndSwichToIt(String tabTitle){
+        for(String tabHandle:driver.getWindowHandles()){
+            driver.switchTo().window(tabHandle);
+            //System.out.println(tabHandle+":"+driver.getTitle());
+            if (driver.getTitle().equals(tabTitle)){
+                return;
+            }
+        }
+        Assert.fail("Not founded browser tab with title:"+tabTitle);
+
+    }
+
+
 }

@@ -3,6 +3,7 @@ package tests;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -15,13 +16,13 @@ public class LoginTests extends TestBase{
 
     @BeforeMethod
     public void initTests(){
-        loginPage = new LoginPageHelper(driver);
-        boardsPage = new BoardsPageHelper(driver);
+        loginPage = PageFactory.initElements(driver, LoginPageHelper.class);
+        boardsPage = PageFactory.initElements(driver,BoardsPageHelper.class);
+        loginPage.openLoginPage();
     }
 
     @Test
     public void loginTestPositive()  {
-        loginPage.openLoginPage();
         loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
         loginPage.enterPasswordAtlassionAndClickLogin(PASSWORD);
         boardsPage.waitUntilPageIsLoaded();
@@ -32,7 +33,6 @@ public class LoginTests extends TestBase{
 
     @Test
     public void loginNegativeNoLoginNoPassword()  {
-        loginPage.openLoginPage();
         loginPage.pressLoginButton();
         loginPage.waitErrorMessage();
 
@@ -41,31 +41,23 @@ public class LoginTests extends TestBase{
 
 
     @Test
-    public void NegativeLoginIncorrect() throws InterruptedException {
-        loginPage.openLoginPage();
-        loginPage.enterLogin("ttt@test.com");
-        loginPage.pressLoginButton();
-        loginPage.waitErrorMessage();
-        System.out.println("Error message: " + loginPage.getErrorMessage());
-        Assert.assertEquals(loginPage.getErrorMessage(), "There isn't an account for this email","Error message is not correct");
+    public void NegativeLoginIncorrect()  {
+        loginPage.enterLoginNormal("ttt@test.com");
+        loginPage.clickLoginButtonNormal();
+        loginPage.waitErrorMessageLoginIncorrect();
+
+        Assert.assertEquals(loginPage.getErrorMessageloginIncorrect(),"There isn't an account for this email","Error message is not correct");
     }
 
     @Test
-    public void NegativePasswordIncorrect() throws InterruptedException {
-        //--- Press log In menu button
-        loginPage.openLoginPage();
-
-        //--- Enter Correct Login
-        loginPage.enterLoginAtlassianAndClickLogin(LOGIN);
-
-        //---Enter incorrect password ---
-        loginPage.enterPasswordAtlassionAndClickLogin("error");
-
-        loginPage.waitAtlassianErrorMessage();
+    public void NegativePasswordIncorrect()  {
+        loginPage.loginAsAtlassian(LOGIN,"error");
+        loginPage.waitErrorMessagePasswordIncorrect();
 
         //---Print error message ---
-        System.out.println("Error message: " + loginPage.getAtlassianErrorMessage());
-        Assert.assertTrue(loginPage.getAtlassianErrorMessage().contains("Incorrect email address and / or password."),
+        WebElement errorMessage = driver.findElement(By.xpath("//div[@id='login-error']/span"));
+        System.out.println("Error message: " + errorMessage.getText());
+        Assert.assertTrue(loginPage.getIncorrectPassswordMessage().contains("Incorrect email address and / or password."),
                 "There is no error message or the text of the message is not correct");
     }
 

@@ -2,6 +2,7 @@ package tests;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,53 +13,43 @@ import pages.LoginPageHelper;
 public class CurrentBoardTests extends TestBase{
     LoginPageHelper loginPage;
     BoardsPageHelper boardsPage;
-    CurrentBoardHelper currentBoard;
+    CurrentBoardHelper qaHaifa56Page;
 
     @BeforeMethod
     public void initTests() throws InterruptedException {
-        loginPage = new LoginPageHelper(driver);
-        boardsPage = new BoardsPageHelper(driver);
-        currentBoard = new CurrentBoardHelper(driver);
+        loginPage = PageFactory.initElements(driver,LoginPageHelper.class);
+        boardsPage = PageFactory.initElements(driver,BoardsPageHelper.class);
+        qaHaifa56Page = new CurrentBoardHelper(driver,BOARD_TITLE);
         loginPage.openLoginPage();
         loginPage.loginAsAtlassian(LOGIN,PASSWORD);
         boardsPage.waitUntilPageIsLoaded();
-        currentBoard.openCurrentBoard(BOARD_TITLE);
-        currentBoard.waitUntilPageBoardIsLoaded(BOARD_TITLE);
+        qaHaifa56Page.openCurrentBoard();
+        qaHaifa56Page.waitUntilPageIsLoaded();
     }
 
     @Test
     public void createNewList()  {
-
-        //--- Add new list---
-        int beforeAdding = currentBoard.getListsQuantity();
+        int beforeAdding = qaHaifa56Page.getListsQuantity();
         System.out.println("Lists before adding: " + beforeAdding);
-        currentBoard.createNewList();
-        currentBoard.enterTitle("Test");
-        currentBoard.submitAddingList();
-        currentBoard.cancelFromEditMode();
+        qaHaifa56Page.createNewList("Test");
 
-        int afterAdding = currentBoard.getListsQuantity();
-
+        int afterAdding = qaHaifa56Page.getListsQuantity();
         Assert.assertEquals(afterAdding,beforeAdding+1,
                 "The quantity of lists before adding new list is not the same as the quantity after adding");
 
     }
 
-
     @Test
-    public void createNewCard() throws InterruptedException {
-            if (!currentBoard.iSListExist()) {
-                System.out.println("Lists before adding: "+ currentBoard.getListsQuantity());
-                currentBoard.addNewList("Test");
-                System.out.println("Lists after adding: " + currentBoard.getListsQuantity());
-            }
+    public void createNewCard()  {
+        if (!qaHaifa56Page.existsList()) qaHaifa56Page.createNewList("Test");
 
-            //---Receive the quantity of cards ---
-            int beforeAdding = currentBoard.getCardsQuantity();
-            currentBoard.addNewCard("Test Card");
+        int beforeAdding = qaHaifa56Page.receiveQuantityOfCards();
+        qaHaifa56Page.pressAddCardButton();
+        qaHaifa56Page.enterTextToCard("test card");
+        qaHaifa56Page.submitAddingCard();
+        qaHaifa56Page.cancelEditCardMode();
 
-        //---Receive the quantity of cards ---
-        int afterAdding = currentBoard.getCardsQuantity();
+        int afterAdding = qaHaifa56Page.receiveQuantityOfCards();
         Assert.assertEquals(afterAdding,beforeAdding+1,
                 "The quantity of cards before adding new card is not the same as the quantity after adding");
 

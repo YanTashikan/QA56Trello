@@ -3,123 +3,128 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.testng.annotations.BeforeMethod;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import java.util.List;
 
-//import static tests.TestBase.BOARD_TITLE;
 
 public class CurrentBoardHelper extends PageBase{
+    @FindBy(xpath = "//span[@class='placeholder']")
+    WebElement addListOption;
+
+    @FindBy(xpath = "//input[@placeholder='Enter list title...']")
+    WebElement addTitleField;
+
+    @FindBy(xpath="//input[@type='submit']")
+    WebElement addListButton;
+
+    @FindBy(xpath = "//a[@class='icon-lg icon-close dark-hover js-cancel-edit']")
+    WebElement cancelEditList;
+
+    @FindBy(xpath = "//div[@class = 'list js-list-content']")
+    List<WebElement> listLists;
 
 
-    public CurrentBoardHelper(WebDriver driver) {
+    private String boardName;
+
+    public CurrentBoardHelper(WebDriver driver, String boardName) {
         super(driver);
+        this.boardName = boardName;
+        PageFactory.initElements(driver,this);
     }
-    public void openCurrentBoard(String boardTitle){
+    public void openCurrentBoard(){
+        System.out.println("From openCurrentBoard: " + this.boardName);
         WebElement ourBoard = driver
-                .findElement(By.xpath(boardLocator(boardTitle)));
+                .findElement(By.xpath(boardLocator()));
         ourBoard.click();
     }
 
-    public void waitUntilPageBoardIsLoaded(String boardTitle){
-        waitUntilElementIsVisible(By.xpath("//span[contains(text(),'"+boardTitle+"')]"),10);
-        waitUntilElementIsClickable(By.xpath("//span[@class='placeholder']"),10);
+    public void waitUntilPageIsLoaded(){
+        waitUntilElementIsVisible(By.xpath(boardTitleLocator()),10);
+        waitUntilElementIsClickable(addListOption,10);
     }
 
-    private String boardLocator(String boardTitle) {
-        return "//div[@title = '" + boardTitle + "']/../..";
-    }
+
 
     public int getListsQuantity(){
-        List<WebElement> listLists = driver.findElements(By.xpath("//div[@class = 'list js-list-content']"));
         return listLists.size();
     }
 
-    public int getCardsQuantity(){
-        List<WebElement> cardsLists = driver.findElements(By.cssSelector("a.list-card"));
-        return cardsLists.size();
+    public void createNewList(String title){
+        this.pressCreateNewListButton();
+        this.enterTitle(title);
+        this.submitAddingList();
+        this.cancelFromEditMode();
     }
-
-    public void createNewList() {
-        WebElement addListOption = driver.findElement(By.xpath("//span[@class='placeholder']"));
+    public void pressCreateNewListButton() {
         addListOption.click();
-        waitUntilElementIsVisible(By.xpath("//input[@placeholder='Enter list title...']"),10);
-        WebElement addTitleField = driver.findElement(By.xpath("//input[@placeholder='Enter list title...']"));
+        waitUntilElementIsVisible(addTitleField,10);
     }
 
-    public void enterTitle(String test) {
-        WebElement addTitleField = driver.findElement(By.xpath("//input[@placeholder='Enter list title...']"));
+    public void enterTitle(String title) {
         addTitleField.click();
-        addTitleField.sendKeys("Test");
-        waitUntilElementIsClickable(By.xpath("//input[@type='submit']"),10);
+        addTitleField.sendKeys(title);
+        waitUntilElementIsClickable(addListButton,10);
     }
 
     public void submitAddingList() {
-        WebElement addListButton = driver.findElement(By.xpath("//input[@type='submit']"));
         addListButton.click();
     }
 
     public void cancelFromEditMode() {
-        WebElement cancelEdit = driver
-                .findElement(By.xpath("//a[@class='icon-lg icon-close dark-hover js-cancel-edit']"));
-        cancelEdit.click();
+        cancelEditList.click();
     }
 
-    public boolean iSListExist(){
+    public boolean existsList() {
+        Boolean existsList = false;
         if (driver.findElement(By
                 .xpath("//span[@class='placeholder']")).getText().contains("another"))
         {
-            return true;
-        }else{
-            return false;
+            existsList = true;
         }
+        return existsList;
     }
 
-
-
-    public void addNewList(String titleList){
-        //--- Add new list---
-        WebElement addListOption = driver.findElement(By.xpath("//span[@class='placeholder']"));
-        addListOption.click();
-        WebElement addTitleField = driver.findElement(By.xpath("//input[@placeholder='Enter list title...']"));
-
-        //----Add title of the list
-        addTitleField.click();
-        addTitleField.sendKeys(titleList);
-        waitUntilElementIsClickable(By.xpath("//input[@type='submit']"),10);
-
-        //----Submit of adding list ----
-        WebElement addListButton = driver.findElement(By.xpath("//input[@type='submit']"));
-        addListButton.click();
-
-        //--- Cancel from edit mode ----
-        WebElement cancelEdit = driver.findElement(By.xpath("//a[@class='icon-lg icon-close dark-hover js-cancel-edit']"));
-        cancelEdit.click();
-        waitUntilElementIsNotVisible(By.xpath("//a[@class='icon-lg icon-close dark-hover js-cancel-edit']"), 10);
+    public int receiveQuantityOfCards() {
+        return driver.findElements(By.cssSelector("a.list-card")).size();
     }
 
-
-
-    public void addNewCard(String textCard){
+    public void pressAddCardButton(){
         //--- Define two possible buttons for adding new card and click on the displayed one---
-        WebElement addCardButton = driver.findElement(By.cssSelector("span.js-add-a-card"));
-        WebElement addAnotherCardButton = driver.findElement(By.cssSelector("span.js-add-another-card"));
+        WebElement addCardButton = driver
+                .findElement(By.cssSelector("span.js-add-a-card"));
+        WebElement addAnotherCardButton = driver
+                .findElement(By.cssSelector("span.js-add-another-card"));
         if (addCardButton.isDisplayed()) {
             addCardButton.click();
-        }else{
-            addAnotherCardButton.click();
         }
+        else addAnotherCardButton.click();
+    }
 
-        //--- Enter text, submit the card
+    public void enterTextToCard(String test_card) {
         WebElement textCurrentCard = driver.findElement(By.cssSelector("textarea.list-card-composer-textarea"));
         textCurrentCard.click();
-        textCurrentCard.sendKeys(textCard);
+        textCurrentCard.sendKeys(test_card);
+    }
+
+    public void submitAddingCard() {
         WebElement submitCardButton = driver.findElement(By.xpath("//input[@type='submit'][@value = 'Add Card']"));
         submitCardButton.click();
+    }
 
-        // ---- Cancel edit mode of the next card
+    public void cancelEditCardMode() {
         WebElement cancelEditCardButton = driver.findElement(By.cssSelector("div.card-composer a.icon-close"));
         cancelEditCardButton.click();
         waitUntilElementIsNotVisible(By.cssSelector("div.card-composer a.icon-close"),10);
+    }
+
+    private String boardLocator() {
+        System.out.println("From boardLocator: " + this.boardName);
+        return "//div[@title = '" + boardName + "']/../..";
+    }
+
+    private String boardTitleLocator(){
+        return "//span[contains(text(),'" + boardName + "')]";
     }
 }
