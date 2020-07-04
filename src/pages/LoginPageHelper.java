@@ -44,7 +44,7 @@ public class LoginPageHelper extends PageBase{
     }
 
     public void enterPasswordAtlassionAndClickLogin(String password) {
-
+        waitUntilElementIsClickable(passwordField, 10);
         passwordField.sendKeys(password);
         loginSubmitButton.click();
 
